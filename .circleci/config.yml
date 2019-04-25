@@ -1,0 +1,253 @@
+version: 2.1
+aliases:
+  - &tokaido72
+    working_directory: /tokaido/site
+    docker:
+    - image: tokaido/admin72:edge
+      user: tok
+    - image: mysql:5.7
+      command: --max_allowed_packet=1073741824 --ignore-db-dir=lost+found
+      environment:
+        MYSQL_DATABASE: drupal
+        MYSQL_PASSWORD: drupal
+        MYSQL_ROOT_PASSWORD: drupal
+        MYSQL_USER: drupal
+commands:
+  google-auth:
+    description: Authenticate to Google Cloud
+    steps:
+      - run: echo ${GCLOUD_SERVICE_KEY} > ${HOME}/gcloud-service-key.json
+      - run: gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+      - run: gcloud --quiet config set project ${GCLOUD_PROJECT_ID}
+  wait-for-mysql:
+    description: Use Dockerize to wait for MySQL container to come online
+    steps:
+      - run:
+          name: install dockerize
+          command: cd /tmp && wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && tar -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.6.1
+      - run:
+          name: waiting for Docker container to be ready
+          command: /tmp/dockerize -wait tcp://127.0.0.1:3306 -timeout 3m
+  drush-site-install:
+    description: Test Drush Site-Install Process
+    parameters:
+      package-name:
+        type: string
+    steps:
+      - run:
+          name: testing drush site-install
+          command: cd << parameters.package-name >>/web && drush site-install --db-url=mysql://drupal:drupal@127.0.0.1:3306/drupal --db-su=root --db-su-pw=drupal minimal install_configure_form.enable_update_status_emails=NULL -y
+  upload-package:
+    description: Compress and Upload the Drupal template to the downloads.tokaido.io bucket
+    parameters:
+      package-name:
+        type: string
+    steps:
+      - run:
+          name: creating package tarball
+          command: cd << parameters.package-name >> && tar -czf ~/<< parameters.package-name >>.tar.gz *
+      - run:
+          name: uploading package to gcloud bucket
+          command: gsutil -h "Cache-Control:public,max-age=604800" cp ~/<< parameters.package-name >>.tar.gz gs://downloads.tokaido.io/packages/<< parameters.package-name >>.tar.gz
+
+jobs:
+#########
+# NAME: drupal7-basic
+# DESCRIPTION: A plain vanilla Drupal 8 installation with no added modules
+# MAINTAINER: ironstar-io
+########
+  build-drupal7-basic:
+    <<: *tokaido72
+    environment:
+      PACKAGE_NAME: drupal7-basic
+    steps:
+    - checkout
+    - run: mkdir -p $PACKAGE_NAME
+    - run: composer create-project drupal-composer/drupal-project:7.x-dev $PACKAGE_NAME --no-interaction
+    - wait-for-mysql
+    - drush-site-install:
+        package-name: $PACKAGE_NAME
+    - persist_to_workspace:
+        root: /tokaido/site
+        paths:
+          - drupal7-basic
+  release-drupal7-basic:
+    <<: *tokaido72
+    steps:
+      - attach_workspace:
+          at: /tokaido/site
+      - google-auth
+      - upload-package:
+          package-name: drupal7-basic
+
+#########
+# NAME: drupal8-basic
+# DESCRIPTION: A plain vanilla Drupal 8 installation with no added modules
+# MAINTAINER: ironstar-io
+########
+  build-drupal8-basic:
+    <<: *tokaido72
+    environment:
+      PACKAGE_NAME: drupal8-basic
+    steps:
+    - checkout
+    - run: mkdir -p $PACKAGE_NAME
+    - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
+    - wait-for-mysql
+    - drush-site-install:
+        package-name: $PACKAGE_NAME
+    - persist_to_workspace:
+        root: /tokaido/site
+        paths:
+          - drupal8-basic
+  release-drupal8-basic:
+    <<: *tokaido72
+    steps:
+      - attach_workspace:
+          at: /tokaido/site
+      - google-auth
+      - upload-package:
+          package-name: drupal8-basic
+
+#########
+# NAME: drupal8-standard
+# DESCRIPTION: Vanilla D8 with a handful of modules we recommend for use in Tokaido
+# MAINTAINER: ironstar-io
+########
+  build-drupal8-standard:
+    <<: *tokaido72
+    environment:
+      PACKAGE_NAME: drupal8-standard
+    steps:
+    - checkout
+    - run: mkdir -p $PACKAGE_NAME
+    - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
+    - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/monolog:^1.1" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
+    - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
+    - wait-for-mysql
+    - drush-site-install:
+        package-name: $PACKAGE_NAME
+    - persist_to_workspace:
+        root: /tokaido/site
+        paths:
+          - drupal8-standard
+  release-drupal8-standard:
+    <<: *tokaido72
+    steps:
+      - attach_workspace:
+          at: /tokaido/site
+      - google-auth
+      - upload-package:
+          package-name: drupal8-standard
+
+#########
+# NAME: upload-releases-file
+# DESCRIPTION: This uploads the releases.yaml file
+# MAINTAINER: ironstar-io
+########
+  upload-releases-file:
+    <<: *tokaido72
+    steps:
+      - checkout
+      - google-auth
+      - run:
+          name: uploading package to gcloud bucket
+          command: gsutil -h "Cache-Control:public,max-age=604800" cp releases.yaml gs://downloads.tokaido.io/releases.yaml
+
+
+workflows:
+  version: 2
+#########
+# NAME: drupal7-basic
+# DESCRIPTION: Vanilla D8 with a handful of modules we recommend for use in Tokaido
+# MAINTAINER: ironstar-io
+########
+  ondemand-drupal7-basic:
+    jobs:
+      - build-drupal7-basic
+      - release-drupal7-basic:
+          requires:
+            - build-drupal7-basic
+  weekly-drupal7-basic:
+    triggers:
+      - schedule:
+          cron: "0 18 * * 1"
+          filters:
+              branches:
+                only:
+                  - master
+    jobs:
+      - build-drupal7-basic
+      - release-drupal7-basic:
+          requires:
+            - build-drupal7-basic
+
+#########
+# NAME: drupal8-basic
+# DESCRIPTION: A plain vanilla Drupal 8 installation using the "minimal" install profile
+# MAINTAINER: ironstar-io
+########
+  ondemand-drupal8-basic:
+    jobs:
+      - build-drupal8-basic
+      - release-drupal8-basic:
+          requires:
+            - build-drupal8-basic
+  weekly-drupal8-basic:
+    triggers:
+      - schedule:
+          cron: "0 18 * * 1"
+          filters:
+              branches:
+                only:
+                  - master
+    jobs:
+      - build-drupal8-basic
+      - release-drupal8-basic:
+          requires:
+            - build-drupal8-basic
+#########
+# NAME: drupal8-standard
+# DESCRIPTION: Vanilla D8 with a handful of modules we recommend for use in Tokaido
+# MAINTAINER: ironstar-io
+########
+  ondemand-drupal8-standard:
+    jobs:
+      - build-drupal8-standard
+      - release-drupal8-standard:
+          requires:
+            - build-drupal8-standard
+  weekly-drupal8-standard:
+    triggers:
+      - schedule:
+          cron: "0 18 * * 1"
+          filters:
+              branches:
+                only:
+                  - master
+    jobs:
+      - build-drupal8-standard
+      - release-drupal8-standard:
+          requires:
+            - build-drupal8-standard
+
+#########
+# NAME: upload-releases-file
+# DESCRIPTION: This uploads the releases.yaml file
+# MAINTAINER: ironstar-io
+########
+  ondemand-upload-releases-file:
+    jobs:
+      - upload-releases-file
+  weekly-upload-releases-file:
+    triggers:
+      - schedule:
+          cron: "0 18 * * 1"
+          filters:
+              branches:
+                only:
+                  - master
+    jobs:
+      - upload-releases-file

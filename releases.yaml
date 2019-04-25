@@ -1,0 +1,17 @@
+releases:
+  drupal7-basic:
+    package_url: https://downloads.tokaido.io/packages/drupal7-basic.tar.gz
+    post_up_commands:
+      - drush site-install -y minimal
+  drupal8-basic:
+    package_url: https://downloads.tokaido.io/packages/drupal8-basic.tar.gz
+    post_up_commands:
+      - drush site-install -y minimal
+  drupal8-standard:
+    package_url: https://downloads.tokaido.io/packages/drupal8-standard.tar.gz
+    post_up_commands:
+      - drush site-install -y
+  drupal8-umami:
+    package_url: https://downloads.tokaido.io/packages/drupal8-standard.tar.gz
+    post_up_commands:
+      - drush site-install -y demo_umami
