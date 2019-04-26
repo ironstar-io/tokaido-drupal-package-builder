@@ -73,7 +73,7 @@ jobs:
         root: /tokaido/site
         paths:
           - drupal7-basic
-  release-drupal7-basic:
+  template-drupal7-basic:
     <<: *tokaido72
     steps:
       - attach_workspace:
@@ -102,7 +102,7 @@ jobs:
         root: /tokaido/site
         paths:
           - drupal8-basic
-  release-drupal8-basic:
+  template-drupal8-basic:
     <<: *tokaido72
     steps:
       - attach_workspace:
@@ -133,7 +133,7 @@ jobs:
         root: /tokaido/site
         paths:
           - drupal8-standard
-  release-drupal8-standard:
+  template-drupal8-standard:
     <<: *tokaido72
     steps:
       - attach_workspace:
@@ -143,18 +143,18 @@ jobs:
           package-name: drupal8-standard
 
 #########
-# NAME: upload-releases-file
-# DESCRIPTION: This uploads the releases.yaml file
+# NAME: upload-templates-file
+# DESCRIPTION: This uploads the templates.yaml file
 # MAINTAINER: ironstar-io
 ########
-  upload-releases-file:
+  upload-templates-file:
     <<: *tokaido72
     steps:
       - checkout
       - google-auth
       - run:
           name: uploading package to gcloud bucket
-          command: gsutil -h "Cache-Control:public,max-age=604800" cp releases.yaml gs://downloads.tokaido.io/releases.yaml
+          command: gsutil -h "Cache-Control:public,max-age=604800" cp templates.yaml gs://downloads.tokaido.io/templates.yaml
 
 
 workflows:
@@ -167,7 +167,7 @@ workflows:
   ondemand-drupal7-basic:
     jobs:
       - build-drupal7-basic
-      - release-drupal7-basic:
+      - template-drupal7-basic:
           requires:
             - build-drupal7-basic
   weekly-drupal7-basic:
@@ -180,7 +180,7 @@ workflows:
                   - master
     jobs:
       - build-drupal7-basic
-      - release-drupal7-basic:
+      - template-drupal7-basic:
           requires:
             - build-drupal7-basic
 
@@ -192,7 +192,7 @@ workflows:
   ondemand-drupal8-basic:
     jobs:
       - build-drupal8-basic
-      - release-drupal8-basic:
+      - template-drupal8-basic:
           requires:
             - build-drupal8-basic
   weekly-drupal8-basic:
@@ -205,7 +205,7 @@ workflows:
                   - master
     jobs:
       - build-drupal8-basic
-      - release-drupal8-basic:
+      - template-drupal8-basic:
           requires:
             - build-drupal8-basic
 #########
@@ -216,7 +216,7 @@ workflows:
   ondemand-drupal8-standard:
     jobs:
       - build-drupal8-standard
-      - release-drupal8-standard:
+      - template-drupal8-standard:
           requires:
             - build-drupal8-standard
   weekly-drupal8-standard:
@@ -229,19 +229,19 @@ workflows:
                   - master
     jobs:
       - build-drupal8-standard
-      - release-drupal8-standard:
+      - template-drupal8-standard:
           requires:
             - build-drupal8-standard
 
 #########
-# NAME: upload-releases-file
-# DESCRIPTION: This uploads the releases.yaml file
+# NAME: upload-templates-file
+# DESCRIPTION: This uploads the templates.yaml file
 # MAINTAINER: ironstar-io
 ########
-  ondemand-upload-releases-file:
+  ondemand-upload-templates-file:
     jobs:
-      - upload-releases-file
-  weekly-upload-releases-file:
+      - upload-templates-file
+  weekly-upload-templates-file:
     triggers:
       - schedule:
           cron: "0 18 * * 1"
@@ -250,4 +250,4 @@ workflows:
                 only:
                   - master
     jobs:
-      - upload-releases-file
+      - upload-templates-file

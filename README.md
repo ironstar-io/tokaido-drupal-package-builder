@@ -39,7 +39,7 @@ For example, if you'd like to add a custom Drupal 8 config with custom Composer 
         root: /tokaido/site
         paths:
           - yourteam-drupal8-configuration
-  release-yourteam-drupal8-configuration:
+  template-yourteam-drupal8-configuration:
     <<: *tokaido72
     steps:
       - attach_workspace:
@@ -58,7 +58,7 @@ For example, if you'd like to add a custom Drupal 8 config with custom Composer 
   ondemand-yourteam-drupal8-configuration:
     jobs:
       - build-yourteam-drupal8-configuration
-      - release-yourteam-drupal8-configuration:
+      - template-yourteam-drupal8-configuration:
           requires:
             - build-yourteam-drupal8-configuration
   weekly-yourteam-drupal8-configuration:
@@ -72,26 +72,26 @@ For example, if you'd like to add a custom Drupal 8 config with custom Composer 
                   - master
     jobs:
       - build-yourteam-drupal8-configuration
-      - release-yourteam-drupal8-configuration:
+      - template-yourteam-drupal8-configuration:
           requires:
             - build-yourteam-drupal8-configuration
 ```
 
-- Update `/releases.yaml` to add your package to the list of supported packages and also to specify any post-build steps you'd like the Tokaido CLI to run _inside_ the Tokaido environment, such as site-install, etc.
+- Update `/templates.yaml` to add your package to the list of supported packages and also to specify any post-build steps you'd like the Tokaido CLI to run _inside_ the Tokaido environment, such as site-install, etc.
 ```
 #########
 # NAME: yourteam-drupal8-configuration
 # DESCRIPTION: A custom Drupal 8 installation profile
 # MAINTAINER: your-github-username
 ########
-releases:
+templates:
   yourteam-drupal8-configuration:
     package_url: https://downloads.tokaido.io/packages/yourteam-drupal8-configuration.tar.gz
     post_up_commands:
       - drush site-install -y
 ```
 
-Note that if you can take any existing package and simply add a "releases" entry for it in order to customise the post_up_commands section, without the overhead of having to add another package that contains the same things.
+Note that if you can take any existing package and simply add a "templates" entry for it in order to customise the post_up_commands section, without the overhead of having to add another package that contains the same things.
 
 Finally, you can not specify a package_url outside of downloads.tokaido.io. For security reasons, Tokaido will
 only accept PRs that have been through this system.
