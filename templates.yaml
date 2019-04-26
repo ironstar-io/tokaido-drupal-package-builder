@@ -2,20 +2,24 @@ templates:
   - name: "drupal7-basic"
     package_url: "https://downloads.tokaido.io/packages/drupal7-basic.tar.gz"
     drupal_version: 7
+    maintainer: tokaido
     post_up_commands:
       - drush site-install -y minimal
   - name: "drupal8-basic"
     drupal_version: 8
     package_url: "https://downloads.tokaido.io/packages/drupal8-basic.tar.gz"
+    maintainer: tokaido
     post_up_commands:
       - drush site-install -y minimal
   - name: drupal8-standard
     drupal_version: 8
     package_url: "https://downloads.tokaido.io/packages/drupal8-standard.tar.gz"
+    maintainer: tokaido
     post_up_commands:
       - drush site-install -y
   - name: drupal8-umami
     drupal_version: 8
     package_url: "https://downloads.tokaido.io/packages/drupal8-standard.tar.gz"
+    maintainer: tokaido
     post_up_commands:
       - drush site-install -y demo_umami
