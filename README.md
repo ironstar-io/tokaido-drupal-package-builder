@@ -84,11 +84,12 @@ For example, if you'd like to add a custom Drupal 8 config with custom Composer 
 # DESCRIPTION: A custom Drupal 8 installation profile
 # MAINTAINER: your-github-username
 ########
-templates:
-  yourteam-drupal8-configuration:
-    package_url: https://downloads.tokaido.io/packages/yourteam-drupal8-configuration.tar.gz
-    post_up_commands:
-      - drush site-install -y
+  - name: yourteam-drupal8-configuration
+      drupal_version: 8
+      package_url: "https://downloads.tokaido.io/packages/yourteam-drupal8-configuration.tar.gz"
+      maintainer: your-github-username
+      post_up_commands:
+        - drush site-install -y standard
 ```
 
 Note that if you can take any existing package and simply add a "templates" entry for it in order to customise the post_up_commands section, without the overhead of having to add another package that contains the same things.
