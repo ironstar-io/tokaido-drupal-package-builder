@@ -30,15 +30,6 @@ commands:
       - run:
           name: waiting for Docker container to be ready
           command: /tmp/dockerize -wait tcp://127.0.0.1:3306 -timeout 3m
-  drush-site-install:
-    description: Test Drush Site-Install Process
-    parameters:
-      package-name:
-        type: string
-    steps:
-      - run:
-          name: testing drush site-install
-          command: cd << parameters.package-name >>/web && drush site-install --db-url=mysql://drupal:drupal@127.0.0.1:3306/drupal --db-su=root --db-su-pw=drupal minimal install_configure_form.enable_update_status_emails=NULL -y
   upload-package:
     description: Compress and Upload the Drupal template to the downloads.tokaido.io bucket
     parameters:
@@ -67,8 +58,6 @@ jobs:
     - run: mkdir -p $PACKAGE_NAME
     - run: composer create-project drupal-composer/drupal-project:7.x-dev $PACKAGE_NAME --no-interaction
     - wait-for-mysql
-    - drush-site-install:
-        package-name: $PACKAGE_NAME
     - persist_to_workspace:
         root: /tokaido/site
         paths:
@@ -96,8 +85,6 @@ jobs:
     - run: mkdir -p $PACKAGE_NAME
     - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
     - wait-for-mysql
-    - drush-site-install:
-        package-name: $PACKAGE_NAME
     - persist_to_workspace:
         root: /tokaido/site
         paths:
@@ -127,8 +114,6 @@ jobs:
     - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/monolog:^1.1" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
     - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
     - wait-for-mysql
-    - drush-site-install:
-        package-name: $PACKAGE_NAME
     - persist_to_workspace:
         root: /tokaido/site
         paths:
