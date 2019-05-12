@@ -32,3 +32,13 @@ templates:
     package_filename: "drupal8-core-8.8.x.tar.gz"
     maintainer: tokaido-io
     description: "A nightly build of core 8.8.x for Drupal contributors"
+  - name: drupal8-core-8.7.x
+    drupal_version: 8
+    package_filename: "drupal8-core-8.7.x.tar.gz"
+    maintainer: tokaido-io
+    description: "A nightly build of core 8.7.x for Drupal contributors"
+  - name: drupal7-core-7.x
+    drupal_version: 8
+    package_filename: "drupal7-core-7.x.tar.gz"
+    maintainer: tokaido-io
+    description: "A nightly build of core 7.x for Drupal contributors"
