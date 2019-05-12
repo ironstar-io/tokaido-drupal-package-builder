@@ -156,6 +156,34 @@ jobs:
           package-name: drupal8-core-8.8.x
 
 #########
+# NAME: drupal8-core-8-7-x
+# DESCRIPTION: Drupal Core 8.7.x
+# MAINTAINER: ironstar-io
+########
+  build-drupal8-core-8-7-x:
+    <<: *tokaido72
+    environment:
+      PACKAGE_NAME: drupal8-core-8.7.x
+    steps:
+    - checkout
+    - run: mkdir -p $PACKAGE_NAME
+    - run: cd $PACKAGE_NAME && git clone --branch 8.7.x https://git.drupalcode.org/project/drupal.git web
+    - run: cd $PACKAGE_NAME/web && composer install --no-interaction
+    - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
+    - persist_to_workspace:
+        root: /tokaido/site
+        paths:
+          - drupal8-core-8.7.x
+  template-drupal8-core-8-7-x:
+    <<: *tokaido72
+    steps:
+      - attach_workspace:
+          at: /tokaido/site
+      - google-auth
+      - upload-package:
+          package-name: drupal8-core-8.7.x
+
+#########
 # NAME: upload-templates-file
 # DESCRIPTION: This uploads the templates.yaml file
 # MAINTAINER: ironstar-io
@@ -248,7 +276,7 @@ workflows:
 
 #########
 # NAME: drupal8-core-8-8-x
-# DESCRIPTION: A plain vanilla Drupal 8 installation using the "minimal" install profile
+# DESCRIPTION: A Drupal 8 core installation for core contributions
 # MAINTAINER: ironstar-io
 ########
   ondemand-drupal8-core-8-8-x:
@@ -270,6 +298,31 @@ workflows:
       - template-drupal8-core-8-8-x:
           requires:
             - build-drupal8-core-8-8-x
+
+#########
+# NAME: drupal8-core-8-7-x
+# DESCRIPTION: A Drupal 8 core installation for core contributions
+# MAINTAINER: ironstar-io
+########
+  ondemand-drupal8-core-8-7-x:
+    jobs:
+      - build-drupal8-core-8-7-x
+      - template-drupal8-core-8-7-x:
+          requires:
+            - build-drupal8-core-8-7-x
+  daily-drupal8-core-8-7-x:
+    triggers:
+      - schedule:
+          cron: "0 18 * * *"
+          filters:
+              branches:
+                only:
+                  - master
+    jobs:
+      - build-drupal8-core-8-7-x
+      - template-drupal8-core-8-7-x:
+          requires:
+            - build-drupal8-core-8-7-x
 
 #########
 # NAME: upload-templates-file
