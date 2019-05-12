@@ -27,3 +27,8 @@ templates:
     description: "The fastest way to check out Drupal 8. A standard D8 install with the Umami demo"
     post_up_commands:
       - drush site-install -y demo_umami
+  - name: drupal8-core-8.8.x
+    drupal_version: 8
+    package_filename: "drupal8-core-8.8.x.tar.gz"
+    maintainer: tokaido-io
+    description: "A nightly build of core 8.8.x for Drupal contributors"
