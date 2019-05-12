@@ -184,34 +184,6 @@ jobs:
           package-name: drupal8-core-8.7.x
 
 #########
-# NAME: drupal7-core-7-x
-# DESCRIPTION: Drupal 7 Core - 7.x-dev
-# MAINTAINER: ironstar-io
-########
-  build-drupal7-core-7-x:
-    <<: *tokaido72
-    environment:
-      PACKAGE_NAME: drupal7-core-7.x
-    steps:
-    - checkout
-    - run: mkdir -p $PACKAGE_NAME
-    - run: cd $PACKAGE_NAME && git clone --branch 7.x https://git.drupalcode.org/project/drupal.git web
-    - run: cd $PACKAGE_NAME/web && composer install --no-interaction
-    - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
-    - persist_to_workspace:
-        root: /tokaido/site
-        paths:
-          - drupal7-core-7.x
-  template-drupal7-core-7-x:
-    <<: *tokaido72
-    steps:
-      - attach_workspace:
-          at: /tokaido/site
-      - google-auth
-      - upload-package:
-          package-name: drupal7-core-7.x
-
-#########
 # NAME: upload-templates-file
 # DESCRIPTION: This uploads the templates.yaml file
 # MAINTAINER: ironstar-io
@@ -351,31 +323,6 @@ workflows:
       - template-drupal8-core-8-7-x:
           requires:
             - build-drupal8-core-8-7-x
-
-#########
-# NAME: drupal7-core-7-x
-# DESCRIPTION: A Drupal 8 core installation for core contributions
-# MAINTAINER: ironstar-io
-########
-  ondemand-drupal7-core-7-x:
-    jobs:
-      - build-drupal7-core-7-x
-      - template-drupal7-core-7-x:
-          requires:
-            - build-drupal7-core-7-x
-  daily-drupal7-core-7-x:
-    triggers:
-      - schedule:
-          cron: "0 18 * * *"
-          filters:
-              branches:
-                only:
-                  - master
-    jobs:
-      - build-drupal7-core-7-x
-      - template-drupal7-core-7-x:
-          requires:
-            - build-drupal7-core-7-x
 
 #########
 # NAME: upload-templates-file
