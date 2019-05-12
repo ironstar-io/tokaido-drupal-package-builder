@@ -128,11 +128,11 @@ jobs:
           package-name: drupal8-standard
 
 #########
-# NAME: drupal8-core-8.8.x
+# NAME: drupal8-core-8-8-x
 # DESCRIPTION: Drupal Core 8.8.x
 # MAINTAINER: ironstar-io
 ########
-  build-drupal8-core-8.8.x:
+  build-drupal8-core-8-8-x:
     <<: *tokaido72
     environment:
       PACKAGE_NAME: drupal8-core-8.8.x
@@ -145,7 +145,7 @@ jobs:
         root: /tokaido/site
         paths:
           - drupal8-core-8.8.x
-  template-drupal8-core-8.8.x:
+  template-drupal8-core-8-8-x:
     <<: *tokaido72
     steps:
       - attach_workspace:
@@ -246,17 +246,17 @@ workflows:
             - build-drupal8-standard
 
 #########
-# NAME: drupal8-core-8.8.x
+# NAME: drupal8-core-8-8-x
 # DESCRIPTION: A plain vanilla Drupal 8 installation using the "minimal" install profile
 # MAINTAINER: ironstar-io
 ########
-  ondemand-drupal8-core-8.8.x:
+  ondemand-drupal8-core-8-8-x:
     jobs:
-      - build-drupal8-core-8.8.x
-      - template-drupal8-core-8.8.x:
+      - build-drupal8-core-8-8-x
+      - template-drupal8-core-8-8-x:
           requires:
-            - build-drupal8-core-8.8.x
-  daily-drupal8-core-8.8.x:
+            - build-drupal8-core-8-8-x
+  daily-drupal8-core-8-8-x:
     triggers:
       - schedule:
           cron: "0 20 * * *"
@@ -265,10 +265,10 @@ workflows:
                 only:
                   - master
     jobs:
-      - build-drupal8-core-8.8.x
-      - template-drupal8-core-8.8.x:
+      - build-drupal8-core-8-8-x
+      - template-drupal8-core-8-8-x:
           requires:
-            - build-drupal8-core-8.8.x
+            - build-drupal8-core-8-8-x
 
 #########
 # NAME: upload-templates-file
