@@ -141,6 +141,7 @@ jobs:
     - run: mkdir -p $PACKAGE_NAME
     - run: cd $PACKAGE_NAME && git clone --branch 8.8.x https://git.drupalcode.org/project/drupal.git web
     - run: cd $PACKAGE_NAME/web && composer install --no-interaction
+    - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
     - persist_to_workspace:
         root: /tokaido/site
         paths:
@@ -259,7 +260,7 @@ workflows:
   daily-drupal8-core-8-8-x:
     triggers:
       - schedule:
-          cron: "0 20 * * *"
+          cron: "0 18 * * *"
           filters:
               branches:
                 only:
