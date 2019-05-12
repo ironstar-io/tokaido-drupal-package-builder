@@ -42,7 +42,7 @@ templates:
     post_up_commands:
       - drush site-install -y
   - name: drupal7-core-7.x
-    drupal_version: 8
+    drupal_version: 7
     package_filename: "drupal7-core-7.x.tar.gz"
     maintainer: tokaido-io
     description: "A nightly build of core 7.x for Drupal contributors"
