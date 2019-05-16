@@ -20,7 +20,7 @@ templates:
     description: "The latest Drupal 8 version with the standard install profile and some added modules"
     post_up_commands:
       - drush site-install -y
-  - name: drupal8-standard-no-post-install
+  - name: drupal8-no-install
     drupal_version: 8
     package_filename: "drupal8-standard.tar.gz"
     maintainer: tokaido-io
