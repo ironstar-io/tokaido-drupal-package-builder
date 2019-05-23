@@ -22,7 +22,7 @@ commands:
       - run: whoami
       - run: pwd
       - run: wget https://github.com/ironstar-io/tokaido/releases/download/edge/tok-linux-amd64
-      - run: sudo /usr/local/bin/tok && sudo cp tok-linux-amd64 /usr/local/bin/tok
+      - run: sudo cp tok-linux-amd64 /usr/local/bin/tok && sudo chmod a+x /usr/local/bin/tok
       - run: tok new test1 -t drupal8-standard
   google-auth:
     description: Authenticate to Google Cloud
