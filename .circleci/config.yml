@@ -222,19 +222,19 @@ workflows:
       # - template-drupal7-basic:
       #     requires:
       #       - build-drupal7-basic
-  weekly-drupal7-basic:
-    triggers:
-      - schedule:
-          cron: "0 18 * * 1"
-          filters:
-              branches:
-                only:
-                  - master
-    jobs:
-      - build-drupal7-basic
-      - template-drupal7-basic:
-          requires:
-            - build-drupal7-basic
+  # weekly-drupal7-basic:
+  #   triggers:
+  #     - schedule:
+  #         cron: "0 18 * * 1"
+  #         filters:
+  #             branches:
+  #               only:
+  #                 - master
+  #   jobs:
+  #     - build-drupal7-basic
+  #     - template-drupal7-basic:
+  #         requires:
+  #           - build-drupal7-basic
 
 # #########
 # # NAME: drupal8-basic
