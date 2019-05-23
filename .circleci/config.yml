@@ -1,5 +1,8 @@
 version: 2.1
 aliases:
+  - &tokaidoMachinePhp72
+    machine:
+      image: circleci/classic:latest
   - &tokaido72
     working_directory: /tokaido/site
     docker:
@@ -13,6 +16,14 @@ aliases:
         MYSQL_ROOT_PASSWORD: drupal
         MYSQL_USER: drupal
 commands:
+  install-tokaido:
+    description: Downloads and installs Tokaido
+    steps:
+      - run: whoami
+      - run: pwd
+      - run: wget https://github.com/ironstar-io/tokaido/releases/download/edge/tok-linux-amd64
+      - run: sudo /usr/local/bin/tok && sudo cp tok-linux-amd64 /usr/local/bin/tok
+      - run: tok new test1 -t drupal8-standard
   google-auth:
     description: Authenticate to Google Cloud
     steps:
@@ -50,7 +61,7 @@ jobs:
 # MAINTAINER: ironstar-io
 ########
   build-drupal7-basic:
-    <<: *tokaido72
+    <<: *tokaidoMachinePhp72
     environment:
       PACKAGE_NAME: drupal7-basic
     steps:
@@ -62,140 +73,140 @@ jobs:
         root: /tokaido/site
         paths:
           - drupal7-basic
-  template-drupal7-basic:
-    <<: *tokaido72
-    steps:
-      - attach_workspace:
-          at: /tokaido/site
-      - google-auth
-      - upload-package:
-          package-name: drupal7-basic
+  # template-drupal7-basic:
+  #   <<: *tokaidoMachinePhp72
+  #   steps:
+  #     - attach_workspace:
+  #         at: /tokaido/site
+  #     - google-auth
+  #     - upload-package:
+  #         package-name: drupal7-basic
 
-#########
-# NAME: drupal8-basic
-# DESCRIPTION: A plain vanilla Drupal 8 installation with no added modules
-# MAINTAINER: ironstar-io
-########
-  build-drupal8-basic:
-    <<: *tokaido72
-    environment:
-      PACKAGE_NAME: drupal8-basic
-    steps:
-    - checkout
-    - run: mkdir -p $PACKAGE_NAME
-    - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
-    - wait-for-mysql
-    - persist_to_workspace:
-        root: /tokaido/site
-        paths:
-          - drupal8-basic
-  template-drupal8-basic:
-    <<: *tokaido72
-    steps:
-      - attach_workspace:
-          at: /tokaido/site
-      - google-auth
-      - upload-package:
-          package-name: drupal8-basic
+# #########
+# # NAME: drupal8-basic
+# # DESCRIPTION: A plain vanilla Drupal 8 installation with no added modules
+# # MAINTAINER: ironstar-io
+# ########
+#   build-drupal8-basic:
+#     <<: *tokaido72
+#     environment:
+#       PACKAGE_NAME: drupal8-basic
+#     steps:
+#     - checkout
+#     - run: mkdir -p $PACKAGE_NAME
+#     - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
+#     - wait-for-mysql
+#     - persist_to_workspace:
+#         root: /tokaido/site
+#         paths:
+#           - drupal8-basic
+#   template-drupal8-basic:
+#     <<: *tokaido72
+#     steps:
+#       - attach_workspace:
+#           at: /tokaido/site
+#       - google-auth
+#       - upload-package:
+#           package-name: drupal8-basic
 
-#########
-# NAME: drupal8-standard
-# DESCRIPTION: Vanilla D8 with a handful of modules we recommend for use in Tokaido
-# MAINTAINER: ironstar-io
-########
-  build-drupal8-standard:
-    <<: *tokaido72
-    environment:
-      PACKAGE_NAME: drupal8-standard
-    steps:
-    - checkout
-    - run: mkdir -p $PACKAGE_NAME
-    - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
-    - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/monolog:^1.1" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
-    - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
-    - wait-for-mysql
-    - persist_to_workspace:
-        root: /tokaido/site
-        paths:
-          - drupal8-standard
-  template-drupal8-standard:
-    <<: *tokaido72
-    steps:
-      - attach_workspace:
-          at: /tokaido/site
-      - google-auth
-      - upload-package:
-          package-name: drupal8-standard
+# #########
+# # NAME: drupal8-standard
+# # DESCRIPTION: Vanilla D8 with a handful of modules we recommend for use in Tokaido
+# # MAINTAINER: ironstar-io
+# ########
+#   build-drupal8-standard:
+#     <<: *tokaido72
+#     environment:
+#       PACKAGE_NAME: drupal8-standard
+#     steps:
+#     - checkout
+#     - run: mkdir -p $PACKAGE_NAME
+#     - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
+#     - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/monolog:^1.1" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
+#     - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
+#     - wait-for-mysql
+#     - persist_to_workspace:
+#         root: /tokaido/site
+#         paths:
+#           - drupal8-standard
+#   template-drupal8-standard:
+#     <<: *tokaido72
+#     steps:
+#       - attach_workspace:
+#           at: /tokaido/site
+#       - google-auth
+#       - upload-package:
+#           package-name: drupal8-standard
 
-#########
-# NAME: drupal8-core-8-8-x
-# DESCRIPTION: Drupal Core 8.8.x
-# MAINTAINER: ironstar-io
-########
-  build-drupal8-core-8-8-x:
-    <<: *tokaido72
-    environment:
-      PACKAGE_NAME: drupal8-core-8.8.x
-    steps:
-    - checkout
-    - run: mkdir -p $PACKAGE_NAME
-    - run: cd $PACKAGE_NAME && git clone --branch 8.8.x https://git.drupalcode.org/project/drupal.git web
-    - run: cd $PACKAGE_NAME/web && composer install --no-interaction
-    - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
-    - persist_to_workspace:
-        root: /tokaido/site
-        paths:
-          - drupal8-core-8.8.x
-  template-drupal8-core-8-8-x:
-    <<: *tokaido72
-    steps:
-      - attach_workspace:
-          at: /tokaido/site
-      - google-auth
-      - upload-package:
-          package-name: drupal8-core-8.8.x
+# #########
+# # NAME: drupal8-core-8-8-x
+# # DESCRIPTION: Drupal Core 8.8.x
+# # MAINTAINER: ironstar-io
+# ########
+#   build-drupal8-core-8-8-x:
+#     <<: *tokaido72
+#     environment:
+#       PACKAGE_NAME: drupal8-core-8.8.x
+#     steps:
+#     - checkout
+#     - run: mkdir -p $PACKAGE_NAME
+#     - run: cd $PACKAGE_NAME && git clone --branch 8.8.x https://git.drupalcode.org/project/drupal.git web
+#     - run: cd $PACKAGE_NAME/web && composer install --no-interaction
+#     - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
+#     - persist_to_workspace:
+#         root: /tokaido/site
+#         paths:
+#           - drupal8-core-8.8.x
+#   template-drupal8-core-8-8-x:
+#     <<: *tokaido72
+#     steps:
+#       - attach_workspace:
+#           at: /tokaido/site
+#       - google-auth
+#       - upload-package:
+#           package-name: drupal8-core-8.8.x
 
-#########
-# NAME: drupal8-core-8-7-x
-# DESCRIPTION: Drupal Core 8.7.x
-# MAINTAINER: ironstar-io
-########
-  build-drupal8-core-8-7-x:
-    <<: *tokaido72
-    environment:
-      PACKAGE_NAME: drupal8-core-8.7.x
-    steps:
-    - checkout
-    - run: mkdir -p $PACKAGE_NAME
-    - run: cd $PACKAGE_NAME && git clone --branch 8.7.x https://git.drupalcode.org/project/drupal.git web
-    - run: cd $PACKAGE_NAME/web && composer install --no-interaction
-    - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
-    - persist_to_workspace:
-        root: /tokaido/site
-        paths:
-          - drupal8-core-8.7.x
-  template-drupal8-core-8-7-x:
-    <<: *tokaido72
-    steps:
-      - attach_workspace:
-          at: /tokaido/site
-      - google-auth
-      - upload-package:
-          package-name: drupal8-core-8.7.x
+# #########
+# # NAME: drupal8-core-8-7-x
+# # DESCRIPTION: Drupal Core 8.7.x
+# # MAINTAINER: ironstar-io
+# ########
+#   build-drupal8-core-8-7-x:
+#     <<: *tokaido72
+#     environment:
+#       PACKAGE_NAME: drupal8-core-8.7.x
+#     steps:
+#     - checkout
+#     - run: mkdir -p $PACKAGE_NAME
+#     - run: cd $PACKAGE_NAME && git clone --branch 8.7.x https://git.drupalcode.org/project/drupal.git web
+#     - run: cd $PACKAGE_NAME/web && composer install --no-interaction
+#     - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
+#     - persist_to_workspace:
+#         root: /tokaido/site
+#         paths:
+#           - drupal8-core-8.7.x
+#   template-drupal8-core-8-7-x:
+#     <<: *tokaido72
+#     steps:
+#       - attach_workspace:
+#           at: /tokaido/site
+#       - google-auth
+#       - upload-package:
+#           package-name: drupal8-core-8.7.x
 
-#########
-# NAME: upload-templates-file
-# DESCRIPTION: This uploads the templates.yaml file
-# MAINTAINER: ironstar-io
-########
-  upload-templates-file:
-    <<: *tokaido72
-    steps:
-      - checkout
-      - google-auth
-      - run:
-          name: uploading package to gcloud bucket
-          command: gsutil -h "Cache-Control:public,max-age=604800" cp templates.yaml gs://downloads.tokaido.io/templates.yaml
+# #########
+# # NAME: upload-templates-file
+# # DESCRIPTION: This uploads the templates.yaml file
+# # MAINTAINER: ironstar-io
+# ########
+#   upload-templates-file:
+#     <<: *tokaido72
+#     steps:
+#       - checkout
+#       - google-auth
+#       - run:
+#           name: uploading package to gcloud bucket
+#           command: gsutil -h "Cache-Control:public,max-age=604800" cp templates.yaml gs://downloads.tokaido.io/templates.yaml
 
 
 workflows:
@@ -208,9 +219,9 @@ workflows:
   ondemand-drupal7-basic:
     jobs:
       - build-drupal7-basic
-      - template-drupal7-basic:
-          requires:
-            - build-drupal7-basic
+      # - template-drupal7-basic:
+      #     requires:
+      #       - build-drupal7-basic
   weekly-drupal7-basic:
     triggers:
       - schedule:
@@ -225,120 +236,120 @@ workflows:
           requires:
             - build-drupal7-basic
 
-#########
-# NAME: drupal8-basic
-# DESCRIPTION: A plain vanilla Drupal 8 installation using the "minimal" install profile
-# MAINTAINER: ironstar-io
-########
-  ondemand-drupal8-basic:
-    jobs:
-      - build-drupal8-basic
-      - template-drupal8-basic:
-          requires:
-            - build-drupal8-basic
-  weekly-drupal8-basic:
-    triggers:
-      - schedule:
-          cron: "0 18 * * 1"
-          filters:
-              branches:
-                only:
-                  - master
-    jobs:
-      - build-drupal8-basic
-      - template-drupal8-basic:
-          requires:
-            - build-drupal8-basic
-#########
-# NAME: drupal8-standard
-# DESCRIPTION: Vanilla D8 with a handful of modules we recommend for use in Tokaido
-# MAINTAINER: ironstar-io
-########
-  ondemand-drupal8-standard:
-    jobs:
-      - build-drupal8-standard
-      - template-drupal8-standard:
-          requires:
-            - build-drupal8-standard
-  weekly-drupal8-standard:
-    triggers:
-      - schedule:
-          cron: "0 18 * * 1"
-          filters:
-              branches:
-                only:
-                  - master
-    jobs:
-      - build-drupal8-standard
-      - template-drupal8-standard:
-          requires:
-            - build-drupal8-standard
+# #########
+# # NAME: drupal8-basic
+# # DESCRIPTION: A plain vanilla Drupal 8 installation using the "minimal" install profile
+# # MAINTAINER: ironstar-io
+# ########
+#   ondemand-drupal8-basic:
+#     jobs:
+#       - build-drupal8-basic
+#       - template-drupal8-basic:
+#           requires:
+#             - build-drupal8-basic
+#   weekly-drupal8-basic:
+#     triggers:
+#       - schedule:
+#           cron: "0 18 * * 1"
+#           filters:
+#               branches:
+#                 only:
+#                   - master
+#     jobs:
+#       - build-drupal8-basic
+#       - template-drupal8-basic:
+#           requires:
+#             - build-drupal8-basic
+# #########
+# # NAME: drupal8-standard
+# # DESCRIPTION: Vanilla D8 with a handful of modules we recommend for use in Tokaido
+# # MAINTAINER: ironstar-io
+# ########
+#   ondemand-drupal8-standard:
+#     jobs:
+#       - build-drupal8-standard
+#       - template-drupal8-standard:
+#           requires:
+#             - build-drupal8-standard
+#   weekly-drupal8-standard:
+#     triggers:
+#       - schedule:
+#           cron: "0 18 * * 1"
+#           filters:
+#               branches:
+#                 only:
+#                   - master
+#     jobs:
+#       - build-drupal8-standard
+#       - template-drupal8-standard:
+#           requires:
+#             - build-drupal8-standard
 
-#########
-# NAME: drupal8-core-8-8-x
-# DESCRIPTION: A Drupal 8 core installation for core contributions
-# MAINTAINER: ironstar-io
-########
-  ondemand-drupal8-core-8-8-x:
-    jobs:
-      - build-drupal8-core-8-8-x
-      - template-drupal8-core-8-8-x:
-          requires:
-            - build-drupal8-core-8-8-x
-  daily-drupal8-core-8-8-x:
-    triggers:
-      - schedule:
-          cron: "0 18 * * *"
-          filters:
-              branches:
-                only:
-                  - master
-    jobs:
-      - build-drupal8-core-8-8-x
-      - template-drupal8-core-8-8-x:
-          requires:
-            - build-drupal8-core-8-8-x
+# #########
+# # NAME: drupal8-core-8-8-x
+# # DESCRIPTION: A Drupal 8 core installation for core contributions
+# # MAINTAINER: ironstar-io
+# ########
+#   ondemand-drupal8-core-8-8-x:
+#     jobs:
+#       - build-drupal8-core-8-8-x
+#       - template-drupal8-core-8-8-x:
+#           requires:
+#             - build-drupal8-core-8-8-x
+#   daily-drupal8-core-8-8-x:
+#     triggers:
+#       - schedule:
+#           cron: "0 18 * * *"
+#           filters:
+#               branches:
+#                 only:
+#                   - master
+#     jobs:
+#       - build-drupal8-core-8-8-x
+#       - template-drupal8-core-8-8-x:
+#           requires:
+#             - build-drupal8-core-8-8-x
 
-#########
-# NAME: drupal8-core-8-7-x
-# DESCRIPTION: A Drupal 8 core installation for core contributions
-# MAINTAINER: ironstar-io
-########
-  ondemand-drupal8-core-8-7-x:
-    jobs:
-      - build-drupal8-core-8-7-x
-      - template-drupal8-core-8-7-x:
-          requires:
-            - build-drupal8-core-8-7-x
-  daily-drupal8-core-8-7-x:
-    triggers:
-      - schedule:
-          cron: "0 18 * * *"
-          filters:
-              branches:
-                only:
-                  - master
-    jobs:
-      - build-drupal8-core-8-7-x
-      - template-drupal8-core-8-7-x:
-          requires:
-            - build-drupal8-core-8-7-x
+# #########
+# # NAME: drupal8-core-8-7-x
+# # DESCRIPTION: A Drupal 8 core installation for core contributions
+# # MAINTAINER: ironstar-io
+# ########
+#   ondemand-drupal8-core-8-7-x:
+#     jobs:
+#       - build-drupal8-core-8-7-x
+#       - template-drupal8-core-8-7-x:
+#           requires:
+#             - build-drupal8-core-8-7-x
+#   daily-drupal8-core-8-7-x:
+#     triggers:
+#       - schedule:
+#           cron: "0 18 * * *"
+#           filters:
+#               branches:
+#                 only:
+#                   - master
+#     jobs:
+#       - build-drupal8-core-8-7-x
+#       - template-drupal8-core-8-7-x:
+#           requires:
+#             - build-drupal8-core-8-7-x
 
-#########
-# NAME: upload-templates-file
-# DESCRIPTION: This uploads the templates.yaml file
-# MAINTAINER: ironstar-io
-########
-  ondemand-upload-templates-file:
-    jobs:
-      - upload-templates-file
-  weekly-upload-templates-file:
-    triggers:
-      - schedule:
-          cron: "0 18 * * 1"
-          filters:
-              branches:
-                only:
-                  - master
-    jobs:
-      - upload-templates-file
+# #########
+# # NAME: upload-templates-file
+# # DESCRIPTION: This uploads the templates.yaml file
+# # MAINTAINER: ironstar-io
+# ########
+#   ondemand-upload-templates-file:
+#     jobs:
+#       - upload-templates-file
+#   weekly-upload-templates-file:
+#     triggers:
+#       - schedule:
+#           cron: "0 18 * * 1"
+#           filters:
+#               branches:
+#                 only:
+#                   - master
+#     jobs:
+#       - upload-templates-file
