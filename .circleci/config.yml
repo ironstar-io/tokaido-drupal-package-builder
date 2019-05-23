@@ -66,6 +66,7 @@ jobs:
       PACKAGE_NAME: drupal7-basic
     steps:
     - checkout
+    - install-tokaido
     - run: mkdir -p $PACKAGE_NAME
     - run: composer create-project drupal-composer/drupal-project:7.x-dev $PACKAGE_NAME --no-interaction
     - wait-for-mysql
