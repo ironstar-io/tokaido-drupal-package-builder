@@ -5,7 +5,7 @@ aliases:
     docker:
     - image: tokaido/admin73:1.11.0
       user: tok
-    - image: mysql:5.7config/sync/core.extension.yml
+    - image: mysql:5.7
       command: --max_allowed_packet=1073741824 --ignore-db-dir=lost+found
       environment:
         MYSQL_DATABASE: drupal
