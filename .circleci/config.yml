@@ -38,7 +38,7 @@ commands:
     steps:
       - run:
           name: creating package tarball
-          command: cd << parameters.package-name >> && tar -czf ~/<< parameters.package-name >>.tar.gz * .*
+          command: cd << parameters.package-name >> && tar -czf ~/<< parameters.package-name >>.tar.gz * .gitignore
       - run:
           name: uploading package to gcloud bucket
           command: gsutil -h "Cache-Control:public,max-age=604800" cp ~/<< parameters.package-name >>.tar.gz gs://downloads.tokaido.io/packages/<< parameters.package-name >>.tar.gz
@@ -165,64 +165,6 @@ jobs:
       - google-auth
       - upload-package:
           package-name: drupal8-ironstar-minimal
-
-#########
-# NAME: drupal8-core-9-0-x
-# DESCRIPTION: Drupal Core 9.0.x
-# MAINTAINER: ironstar-io
-########
-  build-drupal8-core-9-0-x:
-    <<: *tokaido73
-    environment:
-      PACKAGE_NAME: drupal8-core-9.0.x
-    steps:
-    - checkout
-    - run: mkdir -p $PACKAGE_NAME
-    - run: cd $PACKAGE_NAME && git clone --branch 9.0.x https://git.drupalcode.org/project/drupal.git web
-    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
-    - run: cd $PACKAGE_NAME/web && composer install --no-interaction
-    - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
-    - persist_to_workspace:
-        root: /tokaido/site
-        paths:
-          - drupal8-core-9.0.x
-  template-drupal8-core-9-0-x:
-    <<: *tokaido73
-    steps:
-      - attach_workspace:
-          at: /tokaido/site
-      - google-auth
-      - upload-package:
-          package-name: drupal8-core-9.0.x
-
-#########
-# NAME: drupal8-core-8-9-x
-# DESCRIPTION: Drupal Core 8.9.x
-# MAINTAINER: ironstar-io
-########
-  build-drupal8-core-8-9-x:
-    <<: *tokaido73
-    environment:
-      PACKAGE_NAME: drupal8-core-8.9.x
-    steps:
-    - checkout
-    - run: mkdir -p $PACKAGE_NAME
-    - run: cd $PACKAGE_NAME && git clone --branch 8.9.x https://git.drupalcode.org/project/drupal.git web
-    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
-    - run: cd $PACKAGE_NAME/web && composer install --no-interaction
-    - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
-    - persist_to_workspace:
-        root: /tokaido/site
-        paths:
-          - drupal8-core-8.9.x
-  template-drupal8-core-8-9-x:
-    <<: *tokaido73
-    steps:
-      - attach_workspace:
-          at: /tokaido/site
-      - google-auth
-      - upload-package:
-          package-name: drupal8-core-8.9.x
 
 #########
 # NAME: drupal8-core-8-8-x

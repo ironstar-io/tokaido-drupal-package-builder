@@ -69,11 +69,3 @@ templates:
     description: "A nightly build of core 8.9.x for Drupal contributors"
     post_up_commands:
       - drush site-install -y
-
-  - name: drupal8-core-9.0.x
-    drupal_version: 9
-    package_filename: "drupal8-core-9.0.x.tar.gz"
-    maintainer: tokaido-io
-    description: "A nightly build of core 9.0.x for Drupal contributors"
-    post_up_commands:
-      - drush site-install -y
