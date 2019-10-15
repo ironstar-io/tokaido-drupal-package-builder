@@ -1,0 +1,9 @@
+parameters:
+  monolog.channel_handlers:
+    default: ['stream']
+  monolog.processors: ['message_placeholder', 'current_user', 'request_uri', 'ip', 'referer', 'filter_backtrace']
+
+services:
+  monolog.handler.stream:
+    class: Monolog\Handler\StreamHandler
+    arguments: ['/tokaido/logs/fpm/drupal.log', 10, 'monolog.level.notice']

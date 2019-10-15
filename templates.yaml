@@ -1,4 +1,5 @@
 templates:
+
   - name: "drupal7-basic"
     package_filename: "drupal7-basic.tar.gz"
     drupal_version: 7
@@ -6,6 +7,7 @@ templates:
     description: "A basic installation of the latest Drupal 7 version"
     post_up_commands:
       - drush site-install -y minimal
+
   - name: "drupal8-basic"
     drupal_version: 8
     package_filename: "drupal8-basic.tar.gz"
@@ -13,6 +15,7 @@ templates:
     description: "A basic installation of the latest Drupal 8 version with minimal install profile"
     post_up_commands:
       - drush site-install -y minimal
+
   - name: drupal8-standard
     drupal_version: 8
     package_filename: "drupal8-standard.tar.gz"
@@ -20,11 +23,21 @@ templates:
     description: "The latest Drupal 8 version with the standard install profile and some added modules"
     post_up_commands:
       - drush site-install -y
+
   - name: drupal8-no-install
     drupal_version: 8
     package_filename: "drupal8-standard.tar.gz"
     maintainer: tokaido-io
     description: "The latest Drupal 8 version with some added modules, but does not run `drush site-install` after unpacking"
+
+  - name: "drupal8-ironstar-minimal"
+    drupal_version: 8
+    package_filename: "drupal8-ironstar-minimal.tar.gz"
+    maintainer: ironstar-io
+    description: "A minimal install of Drupal 8 with a recommended configuration for Ironstar-hosted sites"
+    post_up_commands:
+      - drush site-install -y minimal
+
   - name: drupal8-umami
     drupal_version: 8
     package_filename: "drupal8-standard.tar.gz"
@@ -32,6 +45,15 @@ templates:
     description: "The fastest way to check out Drupal 8. A standard D8 install with the Umami demo"
     post_up_commands:
       - drush site-install -y demo_umami
+
+  - name: drupal8-core-8.7.x
+    drupal_version: 8
+    package_filename: "drupal8-core-8.7.x.tar.gz"
+    maintainer: tokaido-io
+    description: "A nightly build of core 8.7.x for Drupal contributors"
+    post_up_commands:
+      - drush site-install -y
+
   - name: drupal8-core-8.8.x
     drupal_version: 8
     package_filename: "drupal8-core-8.8.x.tar.gz"
@@ -39,10 +61,19 @@ templates:
     description: "A nightly build of core 8.8.x for Drupal contributors"
     post_up_commands:
       - drush site-install -y
-  - name: drupal8-core-8.7.x
+
+  - name: drupal8-core-8.9.x
     drupal_version: 8
-    package_filename: "drupal8-core-8.7.x.tar.gz"
+    package_filename: "drupal8-core-8.9.x.tar.gz"
     maintainer: tokaido-io
-    description: "A nightly build of core 8.7.x for Drupal contributors"
+    description: "A nightly build of core 8.9.x for Drupal contributors"
+    post_up_commands:
+      - drush site-install -y
+
+  - name: drupal8-core-9.0.x
+    drupal_version: 9
+    package_filename: "drupal8-core-9.0.x.tar.gz"
+    maintainer: tokaido-io
+    description: "A nightly build of core 9.0.x for Drupal contributors"
     post_up_commands:
       - drush site-install -y
