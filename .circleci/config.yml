@@ -131,7 +131,7 @@ jobs:
 
 #########
 # NAME: drupal8-ironstar-minimal
-# DESCRIPTION: Vanilla D8 with a handful of modules we recommend for use in Tokaido
+# DESCRIPTION: A recommended, minimal starting configuration for Ironstar-hosted sites
 # MAINTAINER: ironstar-io
 ########
   build-drupal8-ironstar-minimal:
@@ -161,40 +161,6 @@ jobs:
       - google-auth
       - upload-package:
           package-name: drupal8-ironstar-minimal
-
-#########
-# NAME: drupal8-ironstar-standard
-# DESCRIPTION: Vanilla D8 with a handful of modules we recommend for use in Tokaido
-# MAINTAINER: ironstar-io
-########
-  build-drupal8-ironstar-standard:
-    <<: *tokaido73
-    environment:
-      PACKAGE_NAME: drupal8-ironstar-standard
-    steps:
-    - checkout
-    - run: mkdir -p $PACKAGE_NAME
-    - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
-    - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/monolog:^1.1" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
-    - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
-    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
-    - run: cp assets/monolog/monolog.services.yml $PACKAGE_NAME/web/sites/default/monolog.services.yml
-    - run: echo -e "\n// Monolog Configuration installed by Tokaido template" >> $PACKAGE_NAME/web/sites/default/settings.php
-    - run: echo "\$settings['container_yamls'][] = 'sites/default/monolog.services.yml';" >> $PACKAGE_NAME/web/sites/default/settings.php
-    - wait-for-mysql
-    - persist_to_workspace:
-        root: /tokaido/site
-        paths:
-          - drupal8-ironstar-standard
-  template-drupal8-ironstar-standard:
-    <<: *tokaido73
-    steps:
-      - attach_workspace:
-          at: /tokaido/site
-      - google-auth
-      - upload-package:
-          package-name: drupal8-ironstar-standard
-
 
 #########
 # NAME: drupal8-core-8-8-x

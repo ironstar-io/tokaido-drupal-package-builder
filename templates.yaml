@@ -40,16 +40,6 @@ templates:
       - drush en monolog
       - drush cex
 
-  - name: "drupal8-ironstar-standard"
-    drupal_version: 8
-    package_filename: "drupal8-ironstar-standard.tar.gz"
-    maintainer: ironstar-io
-    description: "A standard install of Drupal 8 with a recommended configuration for Ironstar-hosted sites"
-    post_up_commands:
-      - drush site-install -y standard
-      - drush en monolog
-      - drush cex
-
   - name: drupal8-umami
     drupal_version: 8
     package_filename: "drupal8-standard.tar.gz"
@@ -71,13 +61,5 @@ templates:
     package_filename: "drupal8-core-8.8.x.tar.gz"
     maintainer: tokaido-io
     description: "A nightly build of core 8.8.x for Drupal contributors"
-    post_up_commands:
-      - drush site-install -y
-
-  - name: drupal8-core-8.9.x
-    drupal_version: 8
-    package_filename: "drupal8-core-8.9.x.tar.gz"
-    maintainer: tokaido-io
-    description: "A nightly build of core 8.9.x for Drupal contributors"
     post_up_commands:
       - drush site-install -y
