@@ -37,6 +37,18 @@ templates:
     description: "A minimal install of Drupal 8 with a recommended configuration for Ironstar-hosted sites"
     post_up_commands:
       - drush site-install -y minimal
+      - drush en monolog
+      - drush cex
+
+  - name: "drupal8-ironstar-standard"
+    drupal_version: 8
+    package_filename: "drupal8-ironstar-standard.tar.gz"
+    maintainer: ironstar-io
+    description: "A standard install of Drupal 8 with a recommended configuration for Ironstar-hosted sites"
+    post_up_commands:
+      - drush site-install -y standard
+      - drush en monolog
+      - drush cex
 
   - name: drupal8-umami
     drupal_version: 8
