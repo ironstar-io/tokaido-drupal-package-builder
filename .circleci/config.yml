@@ -1,9 +1,9 @@
 version: 2.1
 aliases:
-  - &tokaido72
+  - &tokaido73
     working_directory: /tokaido/site
     docker:
-    - image: tokaido/admin72:edge
+    - image: tokaido/admin73:1.11.0
       user: tok
     - image: mysql:5.7
       command: --max_allowed_packet=1073741824 --ignore-db-dir=lost+found
@@ -38,7 +38,7 @@ commands:
     steps:
       - run:
           name: creating package tarball
-          command: cd << parameters.package-name >> && tar -czf ~/<< parameters.package-name >>.tar.gz *
+          command: cd << parameters.package-name >> && tar -czf ~/<< parameters.package-name >>.tar.gz * .gitignore
       - run:
           name: uploading package to gcloud bucket
           command: gsutil -h "Cache-Control:public,max-age=604800" cp ~/<< parameters.package-name >>.tar.gz gs://downloads.tokaido.io/packages/<< parameters.package-name >>.tar.gz
@@ -50,20 +50,21 @@ jobs:
 # MAINTAINER: ironstar-io
 ########
   build-drupal7-basic:
-    <<: *tokaido72
+    <<: *tokaido73
     environment:
       PACKAGE_NAME: drupal7-basic
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
     - run: composer create-project drupal-composer/drupal-project:7.x-dev $PACKAGE_NAME --no-interaction
+    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
     - wait-for-mysql
     - persist_to_workspace:
         root: /tokaido/site
         paths:
           - drupal7-basic
   template-drupal7-basic:
-    <<: *tokaido72
+    <<: *tokaido73
     steps:
       - attach_workspace:
           at: /tokaido/site
@@ -77,20 +78,21 @@ jobs:
 # MAINTAINER: ironstar-io
 ########
   build-drupal8-basic:
-    <<: *tokaido72
+    <<: *tokaido73
     environment:
       PACKAGE_NAME: drupal8-basic
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
     - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
+    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
     - wait-for-mysql
     - persist_to_workspace:
         root: /tokaido/site
         paths:
           - drupal8-basic
   template-drupal8-basic:
-    <<: *tokaido72
+    <<: *tokaido73
     steps:
       - attach_workspace:
           at: /tokaido/site
@@ -104,14 +106,14 @@ jobs:
 # MAINTAINER: ironstar-io
 ########
   build-drupal8-standard:
-    <<: *tokaido72
+    <<: *tokaido73
     environment:
       PACKAGE_NAME: drupal8-standard
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
     - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
-    - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/monolog:^1.1" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
+    - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
     - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
     - wait-for-mysql
     - persist_to_workspace:
@@ -119,7 +121,7 @@ jobs:
         paths:
           - drupal8-standard
   template-drupal8-standard:
-    <<: *tokaido72
+    <<: *tokaido73
     steps:
       - attach_workspace:
           at: /tokaido/site
@@ -128,18 +130,52 @@ jobs:
           package-name: drupal8-standard
 
 #########
+# NAME: drupal8-ironstar-minimal
+# DESCRIPTION: A recommended, minimal starting configuration for Ironstar-hosted sites
+# MAINTAINER: ironstar-io
+########
+  build-drupal8-ironstar-minimal:
+    <<: *tokaido73
+    environment:
+      PACKAGE_NAME: drupal8-ironstar-minimal
+    steps:
+    - checkout
+    - run: mkdir -p $PACKAGE_NAME
+    - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
+    - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/monolog:^1.1" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
+    - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
+    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
+    - run: cp assets/monolog/monolog.services.yml $PACKAGE_NAME/web/sites/default/monolog.services.yml
+    - run: echo -e "\n// Monolog Configuration installed by Tokaido template" >> $PACKAGE_NAME/web/sites/default/settings.php
+    - run: echo "\$settings['container_yamls'][] = 'sites/default/monolog.services.yml';" >> $PACKAGE_NAME/web/sites/default/settings.php
+    - wait-for-mysql
+    - persist_to_workspace:
+        root: /tokaido/site
+        paths:
+          - drupal8-ironstar-minimal
+  template-drupal8-ironstar-minimal:
+    <<: *tokaido73
+    steps:
+      - attach_workspace:
+          at: /tokaido/site
+      - google-auth
+      - upload-package:
+          package-name: drupal8-ironstar-minimal
+
+#########
 # NAME: drupal8-core-8-8-x
 # DESCRIPTION: Drupal Core 8.8.x
 # MAINTAINER: ironstar-io
 ########
   build-drupal8-core-8-8-x:
-    <<: *tokaido72
+    <<: *tokaido73
     environment:
       PACKAGE_NAME: drupal8-core-8.8.x
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
     - run: cd $PACKAGE_NAME && git clone --branch 8.8.x https://git.drupalcode.org/project/drupal.git web
+    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
     - run: cd $PACKAGE_NAME/web && composer install --no-interaction
     - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
     - persist_to_workspace:
@@ -147,7 +183,7 @@ jobs:
         paths:
           - drupal8-core-8.8.x
   template-drupal8-core-8-8-x:
-    <<: *tokaido72
+    <<: *tokaido73
     steps:
       - attach_workspace:
           at: /tokaido/site
@@ -161,13 +197,14 @@ jobs:
 # MAINTAINER: ironstar-io
 ########
   build-drupal8-core-8-7-x:
-    <<: *tokaido72
+    <<: *tokaido73
     environment:
       PACKAGE_NAME: drupal8-core-8.7.x
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
     - run: cd $PACKAGE_NAME && git clone --branch 8.7.x https://git.drupalcode.org/project/drupal.git web
+    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
     - run: cd $PACKAGE_NAME/web && composer install --no-interaction
     - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
     - persist_to_workspace:
@@ -175,7 +212,7 @@ jobs:
         paths:
           - drupal8-core-8.7.x
   template-drupal8-core-8-7-x:
-    <<: *tokaido72
+    <<: *tokaido73
     steps:
       - attach_workspace:
           at: /tokaido/site
@@ -189,7 +226,7 @@ jobs:
 # MAINTAINER: ironstar-io
 ########
   upload-templates-file:
-    <<: *tokaido72
+    <<: *tokaido73
     steps:
       - checkout
       - google-auth
@@ -273,6 +310,31 @@ workflows:
       - template-drupal8-standard:
           requires:
             - build-drupal8-standard
+
+#########
+# NAME: drupal8-ironstar-minimal
+# DESCRIPTION: Recommended minimal configuration for Ironstar-hosted sites
+# MAINTAINER: ironstar-io
+########
+  ondemand-drupal8-ironstar-minimal:
+    jobs:
+      - build-drupal8-ironstar-minimal
+      - template-drupal8-ironstar-minimal:
+          requires:
+            - build-drupal8-ironstar-minimal
+  weekly-drupal8-ironstar-minimal:
+    triggers:
+      - schedule:
+          cron: "0 18 * * 1"
+          filters:
+              branches:
+                only:
+                  - master
+    jobs:
+      - build-drupal8-ironstar-minimal
+      - template-drupal8-ironstar-minimal:
+          requires:
+            - build-drupal8-ironstar-minimal
 
 #########
 # NAME: drupal8-core-8-8-x
