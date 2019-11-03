@@ -1,13 +1,5 @@
 templates:
 
-  - name: "drupal7-basic"
-    package_filename: "drupal7-basic.tar.gz"
-    drupal_version: 7
-    maintainer: tokaido-io
-    description: "A basic installation of the latest Drupal 7 version"
-    post_up_commands:
-      - drush site-install -y minimal
-
   - name: "drupal8-basic"
     drupal_version: 8
     package_filename: "drupal8-basic.tar.gz"
@@ -63,3 +55,11 @@ templates:
     description: "A nightly build of core 8.8.x for Drupal contributors"
     post_up_commands:
       - drush site-install -y
+
+  - name: "drupal7-basic"
+    package_filename: "drupal7-basic.tar.gz"
+    drupal_version: 7
+    maintainer: tokaido-io
+    description: "A basic installation of the latest Drupal 7 version"
+    post_up_commands:
+      - drush site-install -y minimal
