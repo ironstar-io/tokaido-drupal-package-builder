@@ -177,14 +177,14 @@ jobs:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
     - run: composer create-project drupal/recommended-project:9.0.x $PACKAGE_NAME --no-interaction
+    - run: cd $PACKAGE_NAME && composer require drush/drush
+    - run: cd $PACKAGE_NAME && composer require drupal/memcache drupal/redirect drupal/pathauto
     - run: mv $PACKAGE_NAME/web/sites/default/default.settings.php $PACKAGE_NAME/web/sites/default/settings.php
     - run: mv $PACKAGE_NAME/web/sites/default/default.services.yml $PACKAGE_NAME/web/sites/default/services.yml
-    - run: cd $PACKAGE_NAME && composer require drush/drush
-    - run: cd $PACKAGE_NAME && composer require drupal/memcache drupal/redirect drupal/pathauto drupal/monolog
     - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
-    - run: cp assets/monolog/monolog.services.yml $PACKAGE_NAME/web/sites/default/monolog.services.yml
-    - run: echo -e "\n// Monolog Configuration installed by Tokaido template" >> $PACKAGE_NAME/web/sites/default/settings.php
-    - run: echo "\$settings['container_yamls'][] = 'sites/default/monolog.services.yml';" >> $PACKAGE_NAME/web/sites/default/settings.php
+    # - run: cp assets/monolog/monolog.services.yml $PACKAGE_NAME/web/sites/default/monolog.services.yml
+    # - run: echo -e "\n// Monolog Configuration installed by Tokaido template" >> $PACKAGE_NAME/web/sites/default/settings.php
+    # - run: echo "\$settings['container_yamls'][] = 'sites/default/monolog.services.yml';" >> $PACKAGE_NAME/web/sites/default/settings.php
     - wait-for-mysql
     - persist_to_workspace:
         root: /tokaido/site
