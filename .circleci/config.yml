@@ -221,14 +221,14 @@ jobs:
           package-name: drupal9-ironstar-minimal
 
 #########
-# NAME: drupal8-core-9-0-x
+# NAME: drupal9-core-9-0-x
 # DESCRIPTION: Drupal Core 9.0.x
 # MAINTAINER: ironstar-io
 ########
-  build-drupal8-core-9-0-x:
+  build-drupal9-core-9-0-x:
     <<: *tokaido73
     environment:
-      PACKAGE_NAME: drupal8-core-8.7.x
+      PACKAGE_NAME: drupal9-core-9.0.x
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
@@ -239,25 +239,25 @@ jobs:
     - persist_to_workspace:
         root: /tokaido/site
         paths:
-          - drupal8-core-9.0.x
-  template-drupal8-core-9-0-x:
+          - drupal9-core-9.0.x
+  template-drupal9-core-9-0-x:
     <<: *tokaido73
     steps:
       - attach_workspace:
           at: /tokaido/site
       - google-auth
       - upload-package:
-          package-name: drupal8-core-9.0.x
+          package-name: drupal9-core-9.0.x
 
 #########
-# NAME: drupal8-core-9-1-x
+# NAME: drupal9-core-9-1-x
 # DESCRIPTION: Drupal Core 9.1.x
 # MAINTAINER: ironstar-io
 ########
-  build-drupal8-core-9-1-x:
+  build-drupal9-core-9-1-x:
     <<: *tokaido73
     environment:
-      PACKAGE_NAME: drupal8-core-8.7.x
+      PACKAGE_NAME: drupal9-core-9.1.x
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
@@ -268,8 +268,8 @@ jobs:
     - persist_to_workspace:
         root: /tokaido/site
         paths:
-          - drupal8-core-9.1.x
-  template-drupal8-core-9-1-x:
+          - drupal9-core-9.1.x
+  template-drupal9-core-9-1-x:
     <<: *tokaido73
     steps:
       - attach_workspace:
