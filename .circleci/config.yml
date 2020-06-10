@@ -255,7 +255,7 @@ jobs:
           at: /tokaido/site
       - google-auth
       - upload-package:
-          package-name: drupal8-core-9.1.x
+          package-name: drupal9-core-9.1.x
 
 
 #########
@@ -266,7 +266,7 @@ jobs:
   build-drupal8-core-8-9-x:
     <<: *tokaido73
     environment:
-      PACKAGE_NAME: drupal8-core-8.7.x
+      PACKAGE_NAME: drupal8-core-8.9.x
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
