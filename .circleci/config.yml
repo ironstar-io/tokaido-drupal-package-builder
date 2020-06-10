@@ -129,19 +129,77 @@ jobs:
       - upload-package:
           package-name: drupal8-standard
 
+
 #########
-# NAME: drupal8-ironstar-minimal
-# DESCRIPTION: A recommended, minimal starting configuration for Ironstar-hosted sites
+# NAME: drupal9-basic
+# DESCRIPTION: A plain vanilla Drupal 9 installation with no added modules
 # MAINTAINER: ironstar-io
 ########
-  build-drupal8-ironstar-minimal:
+  build-drupal9-basic:
     <<: *tokaido73
     environment:
-      PACKAGE_NAME: drupal8-ironstar-minimal
+      PACKAGE_NAME: drupal9-basic
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
-    - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
+    - run: composer create-project drupal-composer/drupal-project:9.x-dev $PACKAGE_NAME --no-interaction
+    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
+    - wait-for-mysql
+    - persist_to_workspace:
+        root: /tokaido/site
+        paths:
+          - drupal9-basic
+  template-drupal9-basic:
+    <<: *tokaido73
+    steps:
+      - attach_workspace:
+          at: /tokaido/site
+      - google-auth
+      - upload-package:
+          package-name: drupal9-basic
+
+#########
+# NAME: drupal9-standard
+# DESCRIPTION: Vanilla D9 with a handful of modules we recommend for use in Tokaido
+# MAINTAINER: ironstar-io
+########
+  build-drupal9-standard:
+    <<: *tokaido73
+    environment:
+      PACKAGE_NAME: drupal9-standard
+    steps:
+    - checkout
+    - run: mkdir -p $PACKAGE_NAME
+    - run: composer create-project drupal-composer/drupal-project:9.x-dev $PACKAGE_NAME --no-interaction
+    - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
+    - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
+    - wait-for-mysql
+    - persist_to_workspace:
+        root: /tokaido/site
+        paths:
+          - drupal9-standard
+  template-drupal9-standard:
+    <<: *tokaido73
+    steps:
+      - attach_workspace:
+          at: /tokaido/site
+      - google-auth
+      - upload-package:
+          package-name: drupal9-standard
+
+#########
+# NAME: drupal9-ironstar-minimal
+# DESCRIPTION: A recommended, minimal starting configuration for Ironstar-hosted sites
+# MAINTAINER: ironstar-io
+########
+  build-drupal9-ironstar-minimal:
+    <<: *tokaido73
+    environment:
+      PACKAGE_NAME: drupal9-ironstar-minimal
+    steps:
+    - checkout
+    - run: mkdir -p $PACKAGE_NAME
+    - run: composer create-project drupal-composer/drupal-project:9.x-dev $PACKAGE_NAME --no-interaction
     - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/monolog:^1.1" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
     - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
     - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
@@ -152,15 +210,104 @@ jobs:
     - persist_to_workspace:
         root: /tokaido/site
         paths:
-          - drupal8-ironstar-minimal
-  template-drupal8-ironstar-minimal:
+          - drupal9-ironstar-minimal
+  template-drupal9-ironstar-minimal:
     <<: *tokaido73
     steps:
       - attach_workspace:
           at: /tokaido/site
       - google-auth
       - upload-package:
-          package-name: drupal8-ironstar-minimal
+          package-name: drupal9-ironstar-minimal
+
+#########
+# NAME: drupal8-core-9-0-x
+# DESCRIPTION: Drupal Core 9.0.x
+# MAINTAINER: ironstar-io
+########
+  build-drupal8-core-9-0-x:
+    <<: *tokaido73
+    environment:
+      PACKAGE_NAME: drupal8-core-8.7.x
+    steps:
+    - checkout
+    - run: mkdir -p $PACKAGE_NAME
+    - run: cd $PACKAGE_NAME && git clone --branch 9.0.x https://git.drupalcode.org/project/drupal.git web
+    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
+    - run: cd $PACKAGE_NAME/web && composer install --no-interaction
+    - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
+    - persist_to_workspace:
+        root: /tokaido/site
+        paths:
+          - drupal8-core-9.0.x
+  template-drupal8-core-9-0-x:
+    <<: *tokaido73
+    steps:
+      - attach_workspace:
+          at: /tokaido/site
+      - google-auth
+      - upload-package:
+          package-name: drupal8-core-9.0.x
+
+#########
+# NAME: drupal8-core-9-1-x
+# DESCRIPTION: Drupal Core 9.1.x
+# MAINTAINER: ironstar-io
+########
+  build-drupal8-core-9-1-x:
+    <<: *tokaido73
+    environment:
+      PACKAGE_NAME: drupal8-core-8.7.x
+    steps:
+    - checkout
+    - run: mkdir -p $PACKAGE_NAME
+    - run: cd $PACKAGE_NAME && git clone --branch 9.1.x https://git.drupalcode.org/project/drupal.git web
+    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
+    - run: cd $PACKAGE_NAME/web && composer install --no-interaction
+    - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
+    - persist_to_workspace:
+        root: /tokaido/site
+        paths:
+          - drupal8-core-9.1.x
+  template-drupal8-core-9-1-x:
+    <<: *tokaido73
+    steps:
+      - attach_workspace:
+          at: /tokaido/site
+      - google-auth
+      - upload-package:
+          package-name: drupal8-core-9.1.x
+
+
+#########
+# NAME: drupal8-core-8-9-x
+# DESCRIPTION: Drupal Core 8.9.x
+# MAINTAINER: ironstar-io
+########
+  build-drupal8-core-8-9-x:
+    <<: *tokaido73
+    environment:
+      PACKAGE_NAME: drupal8-core-8.7.x
+    steps:
+    - checkout
+    - run: mkdir -p $PACKAGE_NAME
+    - run: cd $PACKAGE_NAME && git clone --branch 8.9.x https://git.drupalcode.org/project/drupal.git web
+    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
+    - run: cd $PACKAGE_NAME/web && composer install --no-interaction
+    - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
+    - persist_to_workspace:
+        root: /tokaido/site
+        paths:
+          - drupal8-core-8.9.x
+  template-drupal8-core-8-9-x:
+    <<: *tokaido73
+    steps:
+      - attach_workspace:
+          at: /tokaido/site
+      - google-auth
+      - upload-package:
+          package-name: drupal8-core-8.9.x
+
 
 #########
 # NAME: drupal8-core-8-8-x
@@ -256,6 +403,7 @@ workflows:
               branches:
                 only:
                   - master
+                  - develop
     jobs:
       - build-drupal7-basic
       - template-drupal7-basic:
@@ -281,6 +429,7 @@ workflows:
               branches:
                 only:
                   - master
+                  - develop
     jobs:
       - build-drupal8-basic
       - template-drupal8-basic:
@@ -305,6 +454,7 @@ workflows:
               branches:
                 only:
                   - master
+                  - develop
     jobs:
       - build-drupal8-standard
       - template-drupal8-standard:
@@ -312,17 +462,17 @@ workflows:
             - build-drupal8-standard
 
 #########
-# NAME: drupal8-ironstar-minimal
-# DESCRIPTION: Recommended minimal configuration for Ironstar-hosted sites
+# NAME: drupal9-basic
+# DESCRIPTION: A plain vanilla Drupal 9 installation using the "minimal" install profile
 # MAINTAINER: ironstar-io
 ########
-  ondemand-drupal8-ironstar-minimal:
+  ondemand-drupal9-basic:
     jobs:
-      - build-drupal8-ironstar-minimal
-      - template-drupal8-ironstar-minimal:
+      - build-drupal9-basic
+      - template-drupal9-basic:
           requires:
-            - build-drupal8-ironstar-minimal
-  weekly-drupal8-ironstar-minimal:
+            - build-drupal9-basic
+  weekly-drupal9-basic:
     triggers:
       - schedule:
           cron: "0 18 * * 1"
@@ -330,14 +480,148 @@ workflows:
               branches:
                 only:
                   - master
+                  - develop
     jobs:
-      - build-drupal8-ironstar-minimal
-      - template-drupal8-ironstar-minimal:
+      - build-drupal9-basic
+      - template-drupal9-basic:
           requires:
-            - build-drupal8-ironstar-minimal
+            - build-drupal9-basic
+#########
+# NAME: drupal9-standard
+# DESCRIPTION: Vanilla D9 with a handful of modules we recommend for use in Tokaido
+# MAINTAINER: ironstar-io
+########
+  ondemand-drupal9-standard:
+    jobs:
+      - build-drupal9-standard
+      - template-drupal9-standard:
+          requires:
+            - build-drupal9-standard
+  weekly-drupal9-standard:
+    triggers:
+      - schedule:
+          cron: "0 18 * * 1"
+          filters:
+              branches:
+                only:
+                  - master
+                  - develop
+    jobs:
+      - build-drupal9-standard
+      - template-drupal9-standard:
+          requires:
+            - build-drupal9-standard
 
 #########
-# NAME: drupal8-core-8-8-x
+# NAME: drupal9-ironstar-minimal
+# DESCRIPTION: Recommended minimal configuration for Ironstar-hosted sites
+# MAINTAINER: ironstar-io
+########
+  ondemand-drupal9-ironstar-minimal:
+    jobs:
+      - build-drupal9-ironstar-minimal
+      - template-drupal9-ironstar-minimal:
+          requires:
+            - build-drupal9-ironstar-minimal
+  weekly-drupal9-ironstar-minimal:
+    triggers:
+      - schedule:
+          cron: "0 18 * * 1"
+          filters:
+              branches:
+                only:
+                  - master
+                  - develop
+    jobs:
+      - build-drupal9-ironstar-minimal
+      - template-drupal9-ironstar-minimal:
+          requires:
+            - build-drupal9-ironstar-minimal
+
+#########
+# NAME: drupal9-core-9-1-x
+# DESCRIPTION: A Drupal 9 core installation for core contributions
+# MAINTAINER: ironstar-io
+########
+  ondemand-drupal9-core-9-1-x:
+    jobs:
+      - build-drupal9-core-9-1-x
+      - template-drupal9-core-9-1-x:
+          requires:
+            - build-drupal9-core-9-1-x
+  daily-drupal9-core-9-1-x:
+    triggers:
+      - schedule:
+          cron: "0 18 * * *"
+          filters:
+              branches:
+                only:
+                  - master
+                  - develop
+    jobs:
+      - build-drupal9-core-9-1-x
+      - template-drupal9-core-9-1-x:
+          requires:
+            - build-drupal9-core-9-1-x
+
+
+#########
+# NAME: drupal9-core-9-0-x
+# DESCRIPTION: A Drupal 9 core installation for core contributions
+# MAINTAINER: ironstar-io
+########
+  ondemand-drupal9-core-9-0-x:
+    jobs:
+      - build-drupal9-core-9-0-x
+      - template-drupal9-core-9-0-x:
+          requires:
+            - build-drupal9-core-9-0-x
+  daily-drupal9-core-9-0-x:
+    triggers:
+      - schedule:
+          cron: "0 18 * * *"
+          filters:
+              branches:
+                only:
+                  - master
+                  - develop
+    jobs:
+      - build-drupal9-core-9-0-x
+      - template-drupal9-core-9-0-x:
+          requires:
+            - build-drupal9-core-9-0-x
+
+
+#########
+# NAME: drupal8-core-8-9-x
+# DESCRIPTION: A Drupal 8 core installation for core contributions
+# MAINTAINER: ironstar-io
+########
+  ondemand-drupal8-core-8-9-x:
+    jobs:
+      - build-drupal8-core-8-9-x
+      - template-drupal8-core-8-9-x:
+          requires:
+            - build-drupal8-core-8-9-x
+  daily-drupal8-core-8-9-x:
+    triggers:
+      - schedule:
+          cron: "0 18 * * *"
+          filters:
+              branches:
+                only:
+                  - master
+                  - develop
+    jobs:
+      - build-drupal8-core-8-9-x
+      - template-drupal8-core-8-9-x:
+          requires:
+            - build-drupal8-core-8-9-x
+
+
+
+#########
+# NAME: drupal9-core-8-8-x
 # DESCRIPTION: A Drupal 8 core installation for core contributions
 # MAINTAINER: ironstar-io
 ########
@@ -355,6 +639,7 @@ workflows:
               branches:
                 only:
                   - master
+                  - develop
     jobs:
       - build-drupal8-core-8-8-x
       - template-drupal8-core-8-8-x:
@@ -380,6 +665,7 @@ workflows:
               branches:
                 only:
                   - master
+                  - develop
     jobs:
       - build-drupal8-core-8-7-x
       - template-drupal8-core-8-7-x:
@@ -402,5 +688,6 @@ workflows:
               branches:
                 only:
                   - master
+                  - develop
     jobs:
       - upload-templates-file
