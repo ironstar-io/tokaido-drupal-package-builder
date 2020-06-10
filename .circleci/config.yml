@@ -3,7 +3,7 @@ aliases:
   - &tokaido73
     working_directory: /tokaido/site
     docker:
-    - image: tokaido/admin73:1.11.0
+    - image: tokaido/admin73:1.13.0
       user: tok
     - image: mysql:5.7
       command: --max_allowed_packet=1073741824 --ignore-db-dir=lost+found
@@ -131,34 +131,6 @@ jobs:
 
 
 #########
-# NAME: drupal9-basic
-# DESCRIPTION: A plain vanilla Drupal 9 installation with no added modules
-# MAINTAINER: ironstar-io
-########
-  build-drupal9-basic:
-    <<: *tokaido73
-    environment:
-      PACKAGE_NAME: drupal9-basic
-    steps:
-    - checkout
-    - run: mkdir -p $PACKAGE_NAME
-    - run: composer create-project drupal-composer/drupal-project:9.x-dev $PACKAGE_NAME --no-interaction
-    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
-    - wait-for-mysql
-    - persist_to_workspace:
-        root: /tokaido/site
-        paths:
-          - drupal9-basic
-  template-drupal9-basic:
-    <<: *tokaido73
-    steps:
-      - attach_workspace:
-          at: /tokaido/site
-      - google-auth
-      - upload-package:
-          package-name: drupal9-basic
-
-#########
 # NAME: drupal9-standard
 # DESCRIPTION: Vanilla D9 with a handful of modules we recommend for use in Tokaido
 # MAINTAINER: ironstar-io
@@ -167,12 +139,16 @@ jobs:
     <<: *tokaido73
     environment:
       PACKAGE_NAME: drupal9-standard
+      COMPOSER_MEMORY_LIMIT: "-1"
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
-    - run: composer create-project drupal-composer/drupal-project:9.x-dev $PACKAGE_NAME --no-interaction
-    - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
-    - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
+    - run: composer create-project drupal/recommended-project:9.0.x $PACKAGE_NAME --no-interaction
+    - run: mv $PACKAGE_NAME/web/sites/default/default.settings.php $PACKAGE_NAME/web/sites/default/settings.php
+    - run: mv $PACKAGE_NAME/web/sites/default/default.services.yml $PACKAGE_NAME/web/sites/default/services.yml
+    - run: cd $PACKAGE_NAME && composer require drush/drush
+    - run: cd $PACKAGE_NAME && composer require drupal/memcache drupal/redirect drupal/pathauto
+    - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
     - wait-for-mysql
     - persist_to_workspace:
         root: /tokaido/site
@@ -188,20 +164,23 @@ jobs:
           package-name: drupal9-standard
 
 #########
-# NAME: drupal9-ironstar-minimal
-# DESCRIPTION: A recommended, minimal starting configuration for Ironstar-hosted sites
+# NAME: drupal9-ironstar
+# DESCRIPTION: A recommended starting configuration for Ironstar-hosted sites
 # MAINTAINER: ironstar-io
 ########
-  build-drupal9-ironstar-minimal:
+  build-drupal9-ironstar:
     <<: *tokaido73
     environment:
-      PACKAGE_NAME: drupal9-ironstar-minimal
+      PACKAGE_NAME: drupal9-ironstar
+      COMPOSER_MEMORY_LIMIT: "-1"
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
-    - run: composer create-project drupal-composer/drupal-project:9.x-dev $PACKAGE_NAME --no-interaction
-    - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/monolog:^1.1" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
-    - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
+    - run: composer create-project drupal/recommended-project:9.0.x $PACKAGE_NAME --no-interaction
+    - run: mv $PACKAGE_NAME/web/sites/default/default.settings.php $PACKAGE_NAME/web/sites/default/settings.php
+    - run: mv $PACKAGE_NAME/web/sites/default/default.services.yml $PACKAGE_NAME/web/sites/default/services.yml
+    - run: cd $PACKAGE_NAME && composer require drush/drush
+    - run: cd $PACKAGE_NAME && composer require drupal/memcache drupal/redirect drupal/pathauto drupal/monolog
     - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
     - run: cp assets/monolog/monolog.services.yml $PACKAGE_NAME/web/sites/default/monolog.services.yml
     - run: echo -e "\n// Monolog Configuration installed by Tokaido template" >> $PACKAGE_NAME/web/sites/default/settings.php
@@ -210,15 +189,15 @@ jobs:
     - persist_to_workspace:
         root: /tokaido/site
         paths:
-          - drupal9-ironstar-minimal
-  template-drupal9-ironstar-minimal:
+          - drupal9-ironstar
+  template-drupal9-ironstar:
     <<: *tokaido73
     steps:
       - attach_workspace:
           at: /tokaido/site
       - google-auth
       - upload-package:
-          package-name: drupal9-ironstar-minimal
+          package-name: drupal9-ironstar
 
 #########
 # NAME: drupal9-core-9-0-x
@@ -462,31 +441,6 @@ workflows:
             - build-drupal8-standard
 
 #########
-# NAME: drupal9-basic
-# DESCRIPTION: A plain vanilla Drupal 9 installation using the "minimal" install profile
-# MAINTAINER: ironstar-io
-########
-  ondemand-drupal9-basic:
-    jobs:
-      - build-drupal9-basic
-      - template-drupal9-basic:
-          requires:
-            - build-drupal9-basic
-  weekly-drupal9-basic:
-    triggers:
-      - schedule:
-          cron: "0 18 * * 1"
-          filters:
-              branches:
-                only:
-                  - master
-                  - develop
-    jobs:
-      - build-drupal9-basic
-      - template-drupal9-basic:
-          requires:
-            - build-drupal9-basic
-#########
 # NAME: drupal9-standard
 # DESCRIPTION: Vanilla D9 with a handful of modules we recommend for use in Tokaido
 # MAINTAINER: ironstar-io
@@ -513,17 +467,17 @@ workflows:
             - build-drupal9-standard
 
 #########
-# NAME: drupal9-ironstar-minimal
+# NAME: drupal9-ironstar
 # DESCRIPTION: Recommended minimal configuration for Ironstar-hosted sites
 # MAINTAINER: ironstar-io
 ########
-  ondemand-drupal9-ironstar-minimal:
+  ondemand-drupal9-ironstar:
     jobs:
-      - build-drupal9-ironstar-minimal
-      - template-drupal9-ironstar-minimal:
+      - build-drupal9-ironstar
+      - template-drupal9-ironstar:
           requires:
-            - build-drupal9-ironstar-minimal
-  weekly-drupal9-ironstar-minimal:
+            - build-drupal9-ironstar
+  weekly-drupal9-ironstar:
     triggers:
       - schedule:
           cron: "0 18 * * 1"
@@ -533,10 +487,10 @@ workflows:
                   - master
                   - develop
     jobs:
-      - build-drupal9-ironstar-minimal
-      - template-drupal9-ironstar-minimal:
+      - build-drupal9-ironstar
+      - template-drupal9-ironstar:
           requires:
-            - build-drupal9-ironstar-minimal
+            - build-drupal9-ironstar
 
 #########
 # NAME: drupal9-core-9-1-x

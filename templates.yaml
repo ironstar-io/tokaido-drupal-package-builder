@@ -30,22 +30,6 @@ templates:
     maintainer: tokaido-io
     description: "The latest Drupal 8 version with some added modules, but does not run `drush site-install` after unpacking"
 
-  - name: drupal8-umami
-    drupal_version: 8
-    package_filename: "drupal8-standard.tar.gz"
-    maintainer: tokaido-io
-    description: "The fastest way to check out Drupal 8. A standard D8 install with the Umami demo"
-    post_up_commands:
-      - drush site-install -y demo_umami
-
-  - name: "drupal9-basic"
-    drupal_version: 9
-    package_filename: "drupal9-basic.tar.gz"
-    maintainer: tokaido-io
-    description: "A basic installation of the latest Drupal 9 version with minimal install profile"
-    post_up_commands:
-      - drush site-install -y minimal
-
   - name: drupal9-standard
     drupal_version: 9
     package_filename: "drupal9-standard.tar.gz"
@@ -60,9 +44,9 @@ templates:
     maintainer: tokaido-io
     description: "The latest Drupal 9 version with some added modules, but does not run `drush site-install` after unpacking"
 
-  - name: "drupal9-ironstar-minimal"
+  - name: "drupal9-ironstar"
     drupal_version: 9
-    package_filename: "drupal9-ironstar-minimal.tar.gz"
+    package_filename: "drupal9-ironstar.tar.gz"
     maintainer: ironstar-io
     description: "A minimal install of Drupal 9 with a recommended configuration for Ironstar-hosted sites"
     post_up_commands:
