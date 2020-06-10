@@ -51,7 +51,7 @@ templates:
     description: "A minimal install of Drupal 9 with a recommended configuration for Ironstar-hosted sites"
     post_up_commands:
       - drush site-install -y minimal
-      - drush en monolog memcache memcache_admin
+      - drush en memcache memcache_admin
       - drush cex
 
   - name: drupal9-umami
