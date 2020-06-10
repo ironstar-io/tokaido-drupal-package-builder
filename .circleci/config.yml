@@ -86,7 +86,7 @@ jobs:
     - run: mkdir -p $PACKAGE_NAME
     - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
     - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
-    - run: echo "$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
+    - run: echo "\$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
     - run: mkdir -p $PACKAGE_NAME/config/sync
     - wait-for-mysql
     - persist_to_workspace:
@@ -117,7 +117,7 @@ jobs:
     - run: composer create-project drupal-composer/drupal-project:8.x-dev $PACKAGE_NAME --no-interaction
     - run: cd $PACKAGE_NAME && composer require "drupal/memcache:^2.0" "drupal/pathauto:^1.2" "drupal/google_analytics:^2.3"
     - run: cd $PACKAGE_NAME && composer require --dev "drupal/devel:^1.2"
-    - run: echo "$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
+    - run: echo "\$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
     - run: mkdir -p $PACKAGE_NAME/config/sync
     - wait-for-mysql
     - persist_to_workspace:
@@ -152,7 +152,7 @@ jobs:
     - run: mv $PACKAGE_NAME/web/sites/default/default.services.yml $PACKAGE_NAME/web/sites/default/services.yml
     - run: cd $PACKAGE_NAME && composer require drush/drush
     - run: cd $PACKAGE_NAME && composer require drupal/memcache drupal/redirect drupal/pathauto
-    - run: echo "$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
+    - run: echo "\$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
     - run: mkdir -p $PACKAGE_NAME/config/sync
     - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
     - wait-for-mysql
@@ -188,7 +188,7 @@ jobs:
     - run: mv $PACKAGE_NAME/web/sites/default/default.settings.php $PACKAGE_NAME/web/sites/default/settings.php
     - run: mv $PACKAGE_NAME/web/sites/default/default.services.yml $PACKAGE_NAME/web/sites/default/services.yml
     - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
-    - run: echo "$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
+    - run: echo "\$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
     - run: mkdir -p $PACKAGE_NAME/config/sync
     # - run: cp assets/monolog/monolog.services.yml $PACKAGE_NAME/web/sites/default/monolog.services.yml
     # - run: echo -e "\n// Monolog Configuration installed by Tokaido template" >> $PACKAGE_NAME/web/sites/default/settings.php
@@ -223,7 +223,7 @@ jobs:
     - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
     - run: cd $PACKAGE_NAME/web && composer install --no-interaction
     - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
-    - run: echo "$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
+    - run: echo "\$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
     - run: mkdir -p $PACKAGE_NAME/config/sync
     - persist_to_workspace:
         root: /tokaido/site
@@ -254,7 +254,7 @@ jobs:
     - run: cp assets/common/template-gitignore $PACKAGE_NAME/.gitignore
     - run: cd $PACKAGE_NAME/web && composer install --no-interaction
     - run: cd $PACKAGE_NAME/web/sites/default && cp default.settings.php settings.php
-    - run: echo "$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
+    - run: echo "\$settings['config_sync_directory'] = '../config/sync';" >> $PACKAGE_NAME/web/sites/default/settings.php
     - run: mkdir -p $PACKAGE_NAME/config/sync
     - persist_to_workspace:
         root: /tokaido/site
