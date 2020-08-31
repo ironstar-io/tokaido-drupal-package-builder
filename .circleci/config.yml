@@ -182,7 +182,7 @@ jobs:
     steps:
     - checkout
     - run: mkdir -p $PACKAGE_NAME
-    - run: composer create-project drupal/recommended-project:9.0.x $PACKAGE_NAME --no-interaction
+    - run: composer create-project drupal/core-recommended:9.0.x $PACKAGE_NAME --no-interaction
     - run: cd $PACKAGE_NAME && composer require drush/drush
     - run: cd $PACKAGE_NAME && composer require drupal/memcache drupal/redirect drupal/pathauto
     - run: mv $PACKAGE_NAME/web/sites/default/default.settings.php $PACKAGE_NAME/web/sites/default/settings.php
